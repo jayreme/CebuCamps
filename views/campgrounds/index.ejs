@@ -2,9 +2,19 @@
     <h1>Campgrounds!</h1>
     <a href="/campgrounds/new">Add Campground</a>
     <ul>
+    <div class="row">
     <%  for(let campground of campgrounds){ %>
-        
-         <li><a href="/campgrounds/<%= campground._id %>"><%= campground.title %></a></li>
-        
+        <div class="col-sm-4 mb-3">
+        <div class="card" style="width: 20rem;">
+            <img src="<%= campground.image %>" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title"><%= campground.title %></h5>
+              <p class="card-text"><%= campground.description %></p>
+              <a href="/campgrounds/<%=campground._id %>" class="btn btn-primary">View <%= campground.title %></a>
+            </div>
+          </div>
+        </div>
      <% } %>
+    </div>
     </ul>
+
