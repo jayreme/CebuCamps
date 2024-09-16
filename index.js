@@ -4,6 +4,7 @@ const ejsMate = require('ejs-mate');
 const methodOverride = require('method-override');
 const app = express();
 const mongoose = require('mongoose');
+const catchAsync = require('./utils/catchAsync')
 
 const Campground = require('./models/campground');
 
@@ -28,51 +29,55 @@ app.get('/', (req, res) => {
     res.render('home');
 });
 
-app.get('/campgrounds', async (req, res) => {
+app.get('/campgrounds', catchAsync(async (req, res) => {
     const campgrounds = await Campground.find({});
     res.render('campgrounds/index', {campgrounds});
-});
+}));
 
-app.get('/campgrounds/new', async (req , res) => {
+app.get('/campgrounds/new', (req , res) => {
     res.render('campgrounds/new');
 })
 
-app.post('/campgrounds', async (req ,res) => {
+app.post('/campgrounds', catchAsync(async (req ,res) => {
     const obj = req.body;
     const newCamp = new Campground(obj.campground);
     await newCamp.save();
     res.redirect(`/campgrounds/${newCamp._id}`);
-})
+}))
 
 
-app.get('/campgrounds/:id', async (req ,res) => {
+app.get('/campgrounds/:id', catchAsync(async (req ,res) => {
     const { id } = req.params;
     const campground = await Campground.findById(id)
     res.render('campgrounds/show', {campground})
-});
+}));
 
-app.get('/campgrounds/:id/edit', async (req ,res) => {
+app.get('/campgrounds/:id/edit', catchAsync(async (req ,res) => {
     const { id } = req.params;
     const campground = await Campground.findById(id)
     res.render('campgrounds/edit', {campground})
-});
+}));
     
-app.put('/campgrounds/:id', async (req ,res) => {       
+app.put('/campgrounds/:id', catchAsync(async (req ,res) => {       
     const { id } = req.params;
     const update = req.body;
     const campground = await Campground.findByIdAndUpdate(id,{...update.campground});
     res.redirect(`/campgrounds/${campground._id}`);
-})
+}));
 
-app.delete('/campgrounds/:id', async (req ,res) =>{
+app.delete('/campgrounds/:id', catchAsync(async (req ,res) =>{
     const { id } = req.params;
     await Campground.findByIdAndDelete(id)
     res.redirect('/campgrounds');
-})
+}));
 
 app.use((req,res) => {
     res.status(404).send("PAGE NOT FOUND!!")
-})
+});
+
+app.use((err, req, res, next) => {
+    res.send("Oh no, Something went wrong")
+});
 
 app.listen(3000, () => {
     console.log("Serving on port 3000");   
